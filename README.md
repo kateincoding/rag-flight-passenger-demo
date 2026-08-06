@@ -197,7 +197,7 @@ This is a focused demo, and I'd harden it in this order before production:
 4. **Retrieval score floor** as a second out-of-domain guard for queries that slip past clarification.
 5. ~~**Conversation memory** for multi-turn clarification flows.~~ **Done** — a rewrite agent (Stage 0) folds prior turns into a standalone query, so follow-ups like `MI250, June 5` resolve instead of looping. Next step here: a retrieval score floor tied to the *rewritten* query, and trimming very long histories by token budget.
 6. **Observability** — wrap `llm.py` with latency, token counting, and structured logging; monitor judge-score drift.
-7. **SDK migration** — `google-generativeai` is deprecated in favour of `google-genai`. Because every model call is funnelled through `llm.py`, this is a one-file swap, not a scatter of edits across the codebase.
+7. ~~**SDK migration** — `google-generativeai` is deprecated in favour of `google-genai`.~~ **Done** — because every model call is funnelled through `llm.py`, the migration was a single-file swap (client, generation, embeddings, and 429 handling) with no change to any agent.
 
 ---
 

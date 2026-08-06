@@ -6,7 +6,7 @@ No secrets live in code. Set the key before running:
 import os
 
 # ── Models ──
-EMBEDDING_MODEL = "models/gemini-embedding-001"
+EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIM = 3072                     # gemini-embedding-001 output dim
 LLM_MODEL = "gemini-flash-lite-latest"   # alias with free-tier quota. flash-latest -> gemini-3.6-flash caps at 20 req/day
 

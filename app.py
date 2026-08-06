@@ -1,4 +1,4 @@
-"""Streamlit frontend for the multi-agent RAG demo.
+"""Streamlit frontend for the agentic RAG demo.
 
 Run:
     export GOOGLE_API_KEY='your-key'
@@ -10,7 +10,7 @@ import config
 from agents.retrieval import build_vector_store
 from orchestrator import answer_query
 
-st.set_page_config(page_title="Multi-Agent RAG — Flight Assistant", page_icon="✈️")
+st.set_page_config(page_title="Agentic RAG — Flight Assistant", page_icon="✈️")
 
 
 @st.cache_resource(show_spinner="Building vector store...")
@@ -19,9 +19,9 @@ def get_store():
     return build_vector_store()
 
 
-st.title("✈️ Multi-Agent RAG — Flight Assistant")
+st.title("✈️ Agentic RAG — Flight Assistant")
 st.caption(
-    f"Clarification → Retrieval → Generation → LLM-as-Judge  ·  "
+    f"Rewrite → Clarification → Retrieval → Generation → LLM-as-Judge  ·  "
     f"model: `{config.LLM_MODEL}`"
 )
 

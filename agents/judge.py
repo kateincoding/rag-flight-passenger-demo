@@ -7,13 +7,13 @@ Hardened vs. the notebook:
   of the retrieved ids? A citation the model invented is caught without
   trusting the model to catch itself.
 """
-import json
 import re
 from dataclasses import dataclass
 from typing import Dict, List
 
 import config
 from llm import call_gemini
+from utils import clamp01, parse_json_object
 
 JUDGE_PROMPT = """You are evaluating the quality of a flight assistant's answer. Rate each dimension from 0.0 to 1.0.
 
@@ -43,21 +43,6 @@ class JudgeResult:
     citation_check: bool  # deterministic: all cited ids were retrieved
 
 
-def _parse_json(text: str) -> dict:
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        text = text[text.find("{"):]
-    start, end = text.find("{"), text.rfind("}")
-    if start != -1 and end != -1:
-        text = text[start:end + 1]
-    return json.loads(text)
-
-
-def _clamp(x) -> float:
-    return max(0.0, min(1.0, float(x)))
-
-
 def check_citations(answer: str, retrieved_chunks: List[Dict]) -> bool:
     """Deterministic: every [ID] cited in the answer must be a retrieved chunk."""
     cited = set(re.findall(r"\[([A-Z]+-\d+)\]", answer))
@@ -74,11 +59,11 @@ def llm_judge(query: str, retrieved_chunks: List[Dict], answer: str) -> JudgeRes
         .replace("{sources}", sources)
         .replace("{answer}", answer)
     )
-    data = _parse_json(call_gemini(prompt, temperature=0.0, json_mode=True))
+    data = parse_json_object(call_gemini(prompt, temperature=0.0, json_mode=True))
 
-    faith = _clamp(data["faithfulness"])
-    rel = _clamp(data["relevance"])
-    ground = _clamp(data["groundedness"])
+    faith = clamp01(data["faithfulness"])
+    rel = clamp01(data["relevance"])
+    ground = clamp01(data["groundedness"])
     citations_ok = check_citations(answer, retrieved_chunks)
 
     # Verdict decided here, not by the model. Bad citations force a FAIL.

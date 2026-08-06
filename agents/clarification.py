@@ -3,11 +3,11 @@
 Scores query answerability, names missing entities, and generates the
 questions to ask back. Runs before any retrieval/generation budget is spent.
 """
-import json
 from dataclasses import dataclass, field
 from typing import List
 
 from llm import call_gemini
+from utils import parse_json_object
 
 CLARIFICATION_PROMPT = """You are a clarification agent for a flight assistant. Your job is to decide if a passenger query has enough information to be answered from a knowledge base of flight policies, baggage rules, schedules, and services.
 
@@ -39,22 +39,10 @@ class ClarificationResult:
     reasoning: str = ""
 
 
-def _parse_json(text: str) -> dict:
-    """Parse model JSON, tolerating ```json fences or stray text."""
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        text = text[text.find("{"):]
-    start, end = text.find("{"), text.rfind("}")
-    if start != -1 and end != -1:
-        text = text[start:end + 1]
-    return json.loads(text)
-
-
 def clarification_agent(query: str) -> ClarificationResult:
     """Analyze query and return the clarification decision."""
     prompt = CLARIFICATION_PROMPT.replace("{query}", query)
-    data = _parse_json(call_gemini(prompt, temperature=0.0, json_mode=True))
+    data = parse_json_object(call_gemini(prompt, temperature=0.0, json_mode=True))
     return ClarificationResult(
         clarity_score=float(data["clarity_score"]),
         missing_entities=data.get("missing_entities", []),

@@ -1,1 +1,1 @@
-"""Agents package: clarification, retrieval, generation, judge."""
+"""Agents package: rewrite, clarification, retrieval, generation, judge."""

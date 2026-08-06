@@ -63,6 +63,7 @@ Each query returns a full **stage trace** — the seam I'd wire into observabili
 ├── app.py              # Streamlit frontend — chat UI, 4 stages expanding live
 ├── orchestrator.py     # answer_query(): early-exit routing + stage trace
 ├── llm.py              # shared Gemini client + retry/backoff on 429
+├── utils.py            # shared, network-free helpers (JSON parsing, clamp)
 ├── config.py           # models, thresholds, API key from env (no secrets in code)
 ├── agents/
 │   ├── rewrite.py        # Agent 0 — multi-turn contextualization
@@ -72,7 +73,14 @@ Each query returns a full **stage trace** — the seam I'd wire into observabili
 │   └── judge.py          # Agent 4 — LLM-as-Judge + citation check
 ├── knowledge/
 │   └── chunks.json       # the knowledge base (synthetic flight policies)
+├── tests/                # pytest — network-free unit + routing tests
+│   ├── test_utils.py       # JSON parsing, clamp
+│   ├── test_judge.py       # deterministic citation check
+│   ├── test_retrieval.py   # vector math (normalise == cosine)
+│   ├── test_rewrite.py     # multi-turn passthrough + history formatting
+│   └── test_orchestrator.py# routing: early-exit, full pipeline, judge FAIL
 ├── requirements.txt
+├── requirements-dev.txt
 └── README.md
 ```
 
@@ -138,7 +146,20 @@ cp .env.example .env
 ```bash
 streamlit run app.py
 ```
-The app opens at `http://localhost:8501`. Ask a question and watch all four agent stages expand in real time.
+The app opens at `http://localhost:8501`. Ask a question and watch every agent stage expand in real time.
+
+---
+
+## Tests
+
+The pipeline is designed so its logic is testable **without a network call** — the parts that reach the model are isolated behind `llm.py`, and everything else (JSON parsing, the deterministic citation check, vector-normalisation math, and the orchestrator's routing) is pure.
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+`tests/test_orchestrator.py` stubs the agents and asserts the **control flow**: a low-clarity query early-exits before retrieval, a clear query runs the full pipeline, and a judge `FAIL` attaches a warning — the behaviour that makes this *agentic* rather than a fixed chain.
 
 ---
 
@@ -176,6 +197,7 @@ This is a focused demo, and I'd harden it in this order before production:
 4. **Retrieval score floor** as a second out-of-domain guard for queries that slip past clarification.
 5. ~~**Conversation memory** for multi-turn clarification flows.~~ **Done** — a rewrite agent (Stage 0) folds prior turns into a standalone query, so follow-ups like `MI250, June 5` resolve instead of looping. Next step here: a retrieval score floor tied to the *rewritten* query, and trimming very long histories by token budget.
 6. **Observability** — wrap `llm.py` with latency, token counting, and structured logging; monitor judge-score drift.
+7. **SDK migration** — `google-generativeai` is deprecated in favour of `google-genai`. Because every model call is funnelled through `llm.py`, this is a one-file swap, not a scatter of edits across the codebase.
 
 ---
 

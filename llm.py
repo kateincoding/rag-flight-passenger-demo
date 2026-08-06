@@ -42,6 +42,8 @@ def call_gemini(prompt: str, temperature: float = 0.0, json_mode: bool = False,
                 raise
             print(f"429 rate-limited. Waiting {wait}s (attempt {attempt + 1}/{max_retries})...")
             time.sleep(wait)
+    # Unreachable: the loop returns on success and re-raises on the last attempt.
+    raise RuntimeError("call_gemini exhausted retries without returning")
 
 
 def embed(text: str, task_type: str) -> "list[float]":

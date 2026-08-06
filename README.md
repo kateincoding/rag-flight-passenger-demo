@@ -24,8 +24,13 @@ Standard RAG is a fixed chain: embed → retrieve → generate, every query, no 
 ```
                         ┌─────────────────────────────────────┐
    user query  ─────────▶            Orchestrator             │
-                        │        (early-exit routing)          │
+   + chat history       │        (early-exit routing)          │
                         └───────────────┬─────────────────────┘
+                                        │
+              ┌─────────────────────────▼──────────────────────────┐
+              │  0. Rewrite Agent  (multi-turn contextualization)   │
+              │     history + follow-up ──▶ standalone query        │
+              └─────────────────────────┬──────────────────────────┘
                                         │
               ┌─────────────────────────▼──────────────────────────┐
               │  1. Clarification Agent   (input guardrail)         │
@@ -60,6 +65,7 @@ Each query returns a full **stage trace** — the seam I'd wire into observabili
 ├── llm.py              # shared Gemini client + retry/backoff on 429
 ├── config.py           # models, thresholds, API key from env (no secrets in code)
 ├── agents/
+│   ├── rewrite.py        # Agent 0 — multi-turn contextualization
 │   ├── clarification.py  # Agent 1 — answerability guardrail
 │   ├── retrieval.py      # Agent 2 — VectorStore + retrieval_agent()
 │   ├── generation.py     # Agent 3 — grounded, cited answering
@@ -146,6 +152,8 @@ The app opens at `http://localhost:8501`. Ask a question and watch all four agen
 | `what time does my flight leave?` | **Missing entity** → asks for flight number |
 | `what is the meaning of life?` | **Out of domain** → declines, asks to stay on-topic |
 
+**Multi-turn (contextualization):** ask `what documents do I need for my service dog?` → the assistant asks for the flight and date → reply `MI250, June 5`. The rewrite agent folds that fragment back into a standalone question and the full pipeline runs — no re-asking, no loop.
+
 ---
 
 ## Design decisions worth calling out
@@ -166,7 +174,7 @@ This is a focused demo, and I'd harden it in this order before production:
 2. **Adversarial judge tests** — feed known-hallucinated answers and confirm the judge fails them, so the evaluation layer is proven, not asserted.
 3. **Hybrid retrieval** (vector + BM25) for exact policy numbers, plus a cross-encoder reranker.
 4. **Retrieval score floor** as a second out-of-domain guard for queries that slip past clarification.
-5. **Conversation memory** for multi-turn clarification flows.
+5. ~~**Conversation memory** for multi-turn clarification flows.~~ **Done** — a rewrite agent (Stage 0) folds prior turns into a standalone query, so follow-ups like `MI250, June 5` resolve instead of looping. Next step here: a retrieval score floor tied to the *rewritten* query, and trimming very long histories by token budget.
 6. **Observability** — wrap `llm.py` with latency, token counting, and structured logging; monitor judge-score drift.
 
 ---

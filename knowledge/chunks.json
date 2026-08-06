@@ -58,5 +58,15 @@
     "id": "SVC-004",
     "category": "service",
     "text": "Passengers with reduced mobility can request wheelchair assistance at least 48 hours before departure. Service includes assistance from check-in through boarding and disembarking at destination."
+  },
+  {
+    "id": "SVC-005",
+    "category": "service",
+    "text": "Trained service dogs travel free of charge in the cabin at the passenger's feet and do not count as carry-on. Requests must be made at least 48 hours before departure. Emotional support animals are not accepted as service animals and travel under standard pet-in-cabin rules and fees."
+  },
+  {
+    "id": "SVC-006",
+    "category": "service",
+    "text": "To bring a service dog in the cabin, passengers must submit, at least 48 hours before departure: (1) a veterinary health certificate issued within 10 days of travel, (2) proof of up-to-date rabies vaccination, and (3) a service-animal training or handler attestation. For international routes, documents required by the destination country (such as an EU pet passport for travel within the EU) also apply."
   }
 ]

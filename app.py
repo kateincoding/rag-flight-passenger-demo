@@ -64,6 +64,13 @@ def render_stages(result: dict) -> None:
     """Show each pipeline stage in an expander."""
     stages = {s["stage"]: s for s in result["stages"]}
 
+    # Stage 0 — rewrite (only present when the follow-up was contextualized)
+    if "rewrite" in stages:
+        r = stages["rewrite"]
+        with st.expander("0 · Rewrite — follow-up made standalone", expanded=True):
+            st.write("**You asked:**", r["original"])
+            st.write("**Interpreted as:**", r["standalone"])
+
     # Stage 1 — clarification
     if "clarification" in stages:
         c = stages["clarification"]
@@ -101,13 +108,16 @@ def render_stages(result: dict) -> None:
 
 
 if prompt := st.chat_input("Ask a flight question..."):
+    # Snapshot history BEFORE appending the current turn — the rewrite agent
+    # needs prior turns to resolve follow-ups, not the message being asked now.
+    history = list(st.session_state.messages)
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Running 4-agent pipeline..."):
-            result = answer_query(prompt, store)
+        with st.spinner("Running agent pipeline..."):
+            result = answer_query(prompt, store, history=history)
         render_stages(result)
         final = result["final_response"]
         if result.get("warning"):

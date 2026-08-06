@@ -6,18 +6,40 @@ budget on an unanswerable query. Otherwise run retrieve -> generate -> judge.
 
 Every run accumulates a `stages` trace (the observability seam).
 """
-from typing import Dict
+from typing import Dict, List, Optional
 
 import config
 from agents.clarification import clarification_agent
 from agents.generation import generation_agent
 from agents.judge import llm_judge
 from agents.retrieval import VectorStore, retrieval_agent
+from agents.rewrite import rewrite_agent
 
 
-def answer_query(query: str, store: VectorStore, top_k: int = config.DEFAULT_TOP_K) -> Dict:
-    """Full multi-agent RAG pipeline. Returns a structured result with a stage trace."""
+def answer_query(
+    query: str,
+    store: VectorStore,
+    history: Optional[List[Dict]] = None,
+    top_k: int = config.DEFAULT_TOP_K,
+) -> Dict:
+    """Full agentic RAG pipeline. Returns a structured result with a stage trace.
+
+    `history` is the prior chat turns ([{role, content}, ...]); it lets the
+    rewrite agent resolve follow-ups into standalone queries. The rest of the
+    pipeline runs on that rewritten query.
+    """
     result: Dict = {"query": query, "stages": []}
+
+    # ── STAGE 0: Rewrite (multi-turn contextualization) ──
+    standalone = rewrite_agent(query, history)
+    result["standalone_query"] = standalone
+    if standalone != query:
+        result["stages"].append({
+            "stage": "rewrite",
+            "original": query,
+            "standalone": standalone,
+        })
+    query = standalone
 
     # ── STAGE 1: Clarification ──
     clarification = clarification_agent(query)

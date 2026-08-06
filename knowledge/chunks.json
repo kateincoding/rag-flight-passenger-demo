@@ -1,0 +1,62 @@
+[
+  {
+    "id": "BAG-001",
+    "category": "baggage",
+    "text": "Carry-on baggage must not exceed 55x40x23cm and 8kg. One personal item (backpack, purse) up to 40x30x15cm is also allowed. Oversized items must be checked in."
+  },
+  {
+    "id": "BAG-002",
+    "category": "baggage",
+    "text": "Liquids in carry-on must be in containers of 100ml or less, all fitting in a single transparent resealable bag of maximum 1 liter. Baby food and prescribed medications are exempt."
+  },
+  {
+    "id": "BAG-003",
+    "category": "baggage",
+    "text": "Laptops, tablets, and e-readers can be carried in carry-on baggage. During security screening they must be removed and placed in a separate tray. Power banks up to 100Wh are allowed in carry-on only, not checked baggage."
+  },
+  {
+    "id": "BAG-004",
+    "category": "baggage",
+    "text": "Sharp objects including scissors with blades over 6cm, knives, and razor blades are prohibited in carry-on. They must be packed in checked baggage."
+  },
+  {
+    "id": "BAG-005",
+    "category": "baggage",
+    "text": "Sporting equipment such as golf clubs, skis, and bicycles requires special handling. Contact the airline at least 48 hours before departure to arrange transport. Additional fees apply."
+  },
+  {
+    "id": "FL-001",
+    "category": "schedule",
+    "text": "Flight AF1234 from Barcelona to Paris departs daily at 07:15 CET from Terminal 1, gate B12. Boarding starts 45 minutes before departure. Flight duration is approximately 2 hours."
+  },
+  {
+    "id": "FL-002",
+    "category": "schedule",
+    "text": "Flight IB2050 from Barcelona to Madrid departs daily at 09:30 CET from Terminal 1, gate A5. Boarding starts 40 minutes before departure. Flight duration is approximately 1 hour 15 minutes."
+  },
+  {
+    "id": "FL-003",
+    "category": "schedule",
+    "text": "Flight LH1811 from Barcelona to Frankfurt departs daily at 14:20 CET from Terminal 1, gate C8. Boarding starts 45 minutes before departure. Flight duration is approximately 2 hours 30 minutes."
+  },
+  {
+    "id": "SVC-001",
+    "category": "service",
+    "text": "Onboard meals are complimentary on flights over 3 hours. On shorter flights, snacks and beverages are available for purchase. Special meals (vegetarian, kosher, gluten-free) must be requested at least 24 hours before departure."
+  },
+  {
+    "id": "SVC-002",
+    "category": "service",
+    "text": "Wi-Fi is available on most long-haul flights for a fee. Prices start at 5 EUR for messaging-only access and go up to 20 EUR for full internet. Payment accepted in EUR, USD, or by credit card."
+  },
+  {
+    "id": "SVC-003",
+    "category": "service",
+    "text": "Passengers traveling with infants under 2 years old receive a complimentary bassinet on request for long-haul flights. Available on a first-come, first-served basis. Reserve at check-in or online 48 hours before departure."
+  },
+  {
+    "id": "SVC-004",
+    "category": "service",
+    "text": "Passengers with reduced mobility can request wheelchair assistance at least 48 hours before departure. Service includes assistance from check-in through boarding and disembarking at destination."
+  }
+]
